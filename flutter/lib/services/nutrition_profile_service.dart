@@ -1,33 +1,43 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../config/app_config.dart';
 import '../models/nutrition_profile.dart';
 
 class NutritionProfileService {
-  Future<NutritionProfileResult> calculate({
+  NutritionProfileResult calculate({
     required int age,
     required String sex,
     required double heightCm,
     required double weightKg,
     required String activityLevel,
     bool breastfeeding = false,
-  }) async {
-    final response = await http.post(
-      Uri.parse('${AppConfig.apiBaseUrl}/profile/nutrition/calculate'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'age': age,
-        'sex': sex,
-        'height_cm': heightCm,
-        'weight_kg': weightKg,
-        'activity_level': activityLevel,
-        'breastfeeding': breastfeeding,
-      }),
-    );
-    if (response.statusCode >= 400) {
-      throw Exception('Profile calculation failed');
+  }) {
+    if (age <= 0 || heightCm <= 0 || weightKg <= 0) {
+      throw ArgumentError('Invalid profile values');
     }
-    final json = jsonDecode(response.body);
-    return NutritionProfileResult.fromJson(json['data']);
+    final m = heightCm / 100.0;
+    final bmi = double.parse((weightKg / (m * m)).toStringAsFixed(1));
+    final category = bmi < 18.5
+        ? 'underweight'
+        : bmi < 25
+            ? 'healthy_range'
+            : bmi < 30
+                ? 'overweight'
+                : 'obesity_range';
+    final bmr = (10 * weightKg + 6.25 * heightCm - 5 * age +
+            (sex.toLowerCase() == 'male' ? 5 : -161))
+        .roundToDouble();
+    const factors = {
+      'sedentary': 1.20,
+      'low': 1.375,
+      'moderate': 1.55,
+      'high': 1.725,
+    };
+    final tdee = (bmr * (factors[activityLevel] ?? 1.20)).roundToDouble();
+    return NutritionProfileResult(
+      bmi: bmi,
+      bmiCategory: category,
+      bmr: bmr,
+      tdee: tdee,
+      calorieTarget: tdee,
+      breastfeeding: breastfeeding,
+    );
   }
 }
