@@ -7,6 +7,8 @@ import '../config/app_config.dart';
 class LicenseService {
   static const _deviceIdKey = 'fitin_device_id_v1';
   static const _tokenKey = 'fitin_license_token_v1';
+  static const _testLicenseKey = 'FITIN-TEST-2026';
+  static const _testToken = 'LOCAL-TEST-LICENSE';
 
   static Future<String> deviceId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -26,7 +28,9 @@ class LicenseService {
   static Future<Map<String, String>> authHeaders() async {
     final id = await deviceId();
     final t = await token();
-    if (t == null || t.isEmpty) return {'X-FITIN-Device-ID': id};
+    if (t == null || t.isEmpty || t == _testToken) {
+      return {'X-FITIN-Device-ID': id};
+    }
     return {
       'X-FITIN-Device-ID': id,
       'X-FITIN-License-Token': t,
@@ -36,6 +40,11 @@ class LicenseService {
   static Future<bool> validate() async {
     final t = await token();
     if (t == null || t.isEmpty) return false;
+
+    // Temporary local test activation so the Android UI can be tested
+    // without a backend. Remove when permanent offline licensing is added.
+    if (t == _testToken) return true;
+
     final id = await deviceId();
     try {
       final response = await http.post(
@@ -53,6 +62,14 @@ class LicenseService {
   }
 
   static Future<void> activate(String licenseKey) async {
+    final normalizedKey = licenseKey.trim().toUpperCase();
+
+    if (normalizedKey == _testLicenseKey) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_tokenKey, _testToken);
+      return;
+    }
+
     final id = await deviceId();
     final response = await http.post(
       Uri.parse('${AppConfig.apiBaseUrl}/license/activate'),
