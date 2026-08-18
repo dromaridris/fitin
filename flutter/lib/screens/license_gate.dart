@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/license_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/larc_logo.dart';
@@ -16,6 +17,7 @@ class _LicenseGateState extends State<LicenseGate> {
   bool _checking = true;
   bool _licensed = false;
   bool _activating = false;
+  String _deviceCode = '';
   String? _error;
 
   @override
@@ -24,13 +26,30 @@ class _LicenseGateState extends State<LicenseGate> {
     _check();
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Future<void> _check() async {
+    final code = await LicenseService.deviceCode();
     final valid = await LicenseService.validate();
     if (!mounted) return;
     setState(() {
+      _deviceCode = code;
       _checking = false;
       _licensed = valid;
     });
+  }
+
+  Future<void> _copyDeviceCode() async {
+    if (_deviceCode.isEmpty) return;
+    await Clipboard.setData(ClipboardData(text: _deviceCode));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Device Code copied.')),
+    );
   }
 
   Future<void> _activate() async {
@@ -39,18 +58,18 @@ class _LicenseGateState extends State<LicenseGate> {
       setState(() => _error = 'Enter your FITIN license key.');
       return;
     }
+
     setState(() {
       _activating = true;
       _error = null;
     });
+
     try {
       await LicenseService.activate(key);
-      final valid = await LicenseService.validate();
       if (!mounted) return;
       setState(() {
-        _licensed = valid;
+        _licensed = true;
         _activating = false;
-        if (!valid) _error = 'Activation could not be verified.';
       });
     } catch (e) {
       if (!mounted) return;
@@ -94,19 +113,61 @@ class _LicenseGateState extends State<LicenseGate> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'This installation must be licensed before FITIN can be used.',
+                    'Send this Device Code to the seller to receive a permanent offline license.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.textSecondary),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'DEVICE CODE',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 12,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        SelectableText(
+                          _deviceCode,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: AppColors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          onPressed: _copyDeviceCode,
+                          icon: const Icon(Icons.copy, size: 18),
+                          label: const Text('Copy Device Code'),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 24),
                   TextField(
                     controller: _controller,
                     autocorrect: false,
+                    enableSuggestions: false,
                     textCapitalization: TextCapitalization.characters,
                     style: const TextStyle(color: AppColors.white),
                     decoration: const InputDecoration(
                       labelText: 'License key',
-                      hintText: 'FITIN-XXXXXX-XXXXXX-XXXXXX-XXXXXX',
+                      hintText: 'Paste the license received from the seller',
                     ),
                   ),
                   if (_error != null) ...[
@@ -128,7 +189,16 @@ class _LicenseGateState extends State<LicenseGate> {
                               width: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Activate'),
+                          : const Text('Activate Permanently'),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Activation is verified on this device and does not require an internet connection.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 12,
                     ),
                   ),
                 ],

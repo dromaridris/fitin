@@ -1,106 +1,115 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:cryptography/cryptography.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import '../config/app_config.dart';
 
+/// Permanent, offline FITIN licensing.
+///
+/// A private Ed25519 key is kept only in the owner's License Manager.
+/// The app embeds the matching public key and can VERIFY licenses, but it
+/// cannot generate valid licenses itself.
 class LicenseService {
-  static const _deviceIdKey = 'fitin_device_id_v1';
-  static const _tokenKey = 'fitin_license_token_v1';
-  static const _testLicenseKey = 'FITIN-TEST-2026';
-  static const _testToken = 'LOCAL-TEST-LICENSE';
+  static const _installIdKey = 'fitin_install_id_v2';
+  static const _licenseKey = 'fitin_offline_license_v1';
 
-  static Future<String> deviceId() async {
+  // Ed25519 public key matching the private key in FITIN_License_Manager.html.
+  // Public keys are safe to embed in the application.
+  static const _publicKeyBase64 =
+      'LKC7e4RQStuXeKDbO4VQpJ7Ig8vWXUj2JWDUjarTc0U=';
+
+  static final Ed25519 _algorithm = Ed25519();
+
+  /// Stable for this installation. Reinstalling/clearing app data intentionally
+  /// creates a new installation ID and therefore a new device code.
+  static Future<String> _installId() async {
     final prefs = await SharedPreferences.getInstance();
-    var id = prefs.getString(_deviceIdKey);
+    var id = prefs.getString(_installIdKey);
     if (id == null || id.length < 16) {
       id = const Uuid().v4();
-      await prefs.setString(_deviceIdKey, id);
+      await prefs.setString(_installIdKey, id);
     }
     return id;
   }
 
-  static Future<String?> token() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_tokenKey);
+  /// Human-friendly code the customer sends to the app owner.
+  /// Example: A1B2-C3D4-E5F6-7890-ABCD
+  static Future<String> deviceCode() async {
+    final raw = (await _installId()).replaceAll('-', '').toUpperCase();
+    final code = raw.substring(0, 20);
+    return [
+      code.substring(0, 4),
+      code.substring(4, 8),
+      code.substring(8, 12),
+      code.substring(12, 16),
+      code.substring(16, 20),
+    ].join('-');
   }
 
-  static Future<Map<String, String>> authHeaders() async {
-    final id = await deviceId();
-    final t = await token();
-    if (t == null || t.isEmpty || t == _testToken) {
-      return {'X-FITIN-Device-ID': id};
-    }
-    return {
-      'X-FITIN-Device-ID': id,
-      'X-FITIN-License-Token': t,
-    };
+  static Future<String?> storedLicense() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_licenseKey);
   }
+
+  /// Compatibility for the API client. Offline licensing no longer sends
+  /// license tokens or device IDs to a server.
+  static Future<Map<String, String>> authHeaders() async => <String, String>{};
 
   static Future<bool> validate() async {
-    final t = await token();
-    if (t == null || t.isEmpty) return false;
+    final license = await storedLicense();
+    if (license == null || license.trim().isEmpty) return false;
+    return verifyLicense(license);
+  }
 
-    // Temporary local test activation so the Android UI can be tested
-    // without a backend. Remove when permanent offline licensing is added.
-    if (t == _testToken) return true;
+  static Future<void> activate(String licenseKey) async {
+    final normalized = licenseKey.trim();
+    if (!await verifyLicense(normalized)) {
+      throw Exception('Invalid license for this device.');
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_licenseKey, normalized);
+  }
 
-    final id = await deviceId();
+  static Future<bool> verifyLicense(String licenseKey) async {
     try {
-      final response = await http.post(
-        Uri.parse('${AppConfig.apiBaseUrl}/license/validate'),
-        headers: {
-          'Content-Type': 'application/json',
-          'X-FITIN-License-Token': t,
-        },
-        body: jsonEncode({'device_id': id}),
+      final parts = licenseKey.trim().split('.');
+      if (parts.length != 3 || parts[0] != 'FITIN1') return false;
+
+      final licensedDevice = parts[1].toUpperCase();
+      final currentDevice = (await deviceCode()).toUpperCase();
+      if (licensedDevice != currentDevice) return false;
+
+      final signatureBytes = _decodeBase64Url(parts[2]);
+      if (signatureBytes.length != 64) return false;
+
+      final publicKeyBytes = base64Decode(_publicKeyBase64);
+      final publicKey = SimplePublicKey(
+        publicKeyBytes,
+        type: KeyPairType.ed25519,
       );
-      return response.statusCode >= 200 && response.statusCode < 300;
+      final signature = Signature(signatureBytes, publicKey: publicKey);
+      final message = utf8.encode(_messageFor(licensedDevice));
+
+      return await _algorithm.verify(message, signature: signature);
     } catch (_) {
       return false;
     }
   }
 
-  static Future<void> activate(String licenseKey) async {
-    final normalizedKey = licenseKey.trim().toUpperCase();
+  static String _messageFor(String deviceCode) =>
+      'FITIN|1|${deviceCode.toUpperCase()}|PERMANENT';
 
-    if (normalizedKey == _testLicenseKey) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_tokenKey, _testToken);
-      return;
+  static List<int> _decodeBase64Url(String value) {
+    var normalized = value.replaceAll('-', '+').replaceAll('_', '/');
+    while (normalized.length % 4 != 0) {
+      normalized += '=';
     }
-
-    final id = await deviceId();
-    final response = await http.post(
-      Uri.parse('${AppConfig.apiBaseUrl}/license/activate'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'license_key': licenseKey.trim(),
-        'device_id': id,
-      }),
-    );
-    dynamic decoded;
-    try {
-      decoded = jsonDecode(response.body);
-    } catch (_) {
-      decoded = null;
-    }
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = decoded is Map
-          ? (decoded['detail'] ?? 'License activation failed.').toString()
-          : 'License activation failed.';
-      throw Exception(message);
-    }
-    final token = decoded?['data']?['activation_token']?.toString();
-    if (token == null || token.isEmpty) {
-      throw Exception('The server did not return an activation token.');
-    }
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tokenKey, token);
+    return base64Decode(normalized);
   }
 
+  /// For support/testing: clears the local activation only. It does not change
+  /// the installation ID, so the same signed license can reactivate the app.
   static Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
+    await prefs.remove(_licenseKey);
   }
 }
