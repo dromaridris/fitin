@@ -8,6 +8,7 @@ class RecipeService {
   List<RecipeSummary> search({String query = '', String? cuisine}) {
     final raw = query.trim();
     final q = raw.toLowerCase();
+    final normalizedIngredient = normalizeOfflineIngredient(raw);
     return offlineRecipes.where((r) {
       final cuisineOk = cuisine == null || cuisine.isEmpty || r.cuisine == cuisine;
       final queryOk = q.isEmpty ||
@@ -19,7 +20,8 @@ class RecipeService {
             final i = ingredientById(ri.ingredientId);
             return i.nameEn.toLowerCase().contains(q) ||
                 i.nameAr.contains(raw) ||
-                i.nameRo.toLowerCase().contains(q);
+                i.nameRo.toLowerCase().contains(q) ||
+                i.key == normalizedIngredient;
           });
       return cuisineOk && queryOk;
     }).map((r) => RecipeSummary(

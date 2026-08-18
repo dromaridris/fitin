@@ -196,9 +196,87 @@ const offlineRecipes = <OfflineRecipe>[
   OfflineRecipe(88,'Broccoli Cheese Soup','شوربة بروكلي بالجبنة','Broccoli Cheese Soup','European',5,15,35,[OfflineRecipeIngredient(73,700),OfflineRecipeIngredient(3,150),OfflineRecipeIngredient(22,700),OfflineRecipeIngredient(50,180),OfflineRecipeIngredient(20,25),OfflineRecipeIngredient(18,25)]),
   OfflineRecipe(89,'Creamy Mushroom Soup','شوربة فطر بالكريمة','Mushroom Soup','European',5,15,35,[OfflineRecipeIngredient(72,700),OfflineRecipeIngredient(3,150),OfflineRecipeIngredient(80,700),OfflineRecipeIngredient(23,200),OfflineRecipeIngredient(20,25),OfflineRecipeIngredient(18,20)]),
   OfflineRecipe(90,'Vegetable Pasta Bake','معكرونة بالخضار بالفرن','Vegetable Pasta Bake','European',6,20,40,[OfflineRecipeIngredient(47,500),OfflineRecipeIngredient(36,250),OfflineRecipeIngredient(25,220),OfflineRecipeIngredient(72,250),OfflineRecipeIngredient(4,400),OfflineRecipeIngredient(52,220),OfflineRecipeIngredient(10,25)]),
+  OfflineRecipe(91,'Chicken Pulao','بولاو دجاج','Chicken Pulao','Pakistani',6,20,50,[OfflineRecipeIngredient(1,750),OfflineRecipeIngredient(7,500),OfflineRecipeIngredient(3,220),OfflineRecipeIngredient(8,120),OfflineRecipeIngredient(21,30),OfflineRecipeIngredient(27,20),OfflineRecipeIngredient(12,15)]),
+  OfflineRecipe(92,'Aloo Keema','بطاطا مع لحم مفروم','Aloo Qeema','Pakistani',5,15,40,[OfflineRecipeIngredient(17,650),OfflineRecipeIngredient(2,650),OfflineRecipeIngredient(3,180),OfflineRecipeIngredient(4,250),OfflineRecipeIngredient(21,25),OfflineRecipeIngredient(27,15),OfflineRecipeIngredient(12,15)]),
+  OfflineRecipe(93,'Palak Chicken','دجاج بالسبانخ','Palak Chicken','Pakistani',5,20,40,[OfflineRecipeIngredient(1,700),OfflineRecipeIngredient(14,700),OfflineRecipeIngredient(3,180),OfflineRecipeIngredient(4,180),OfflineRecipeIngredient(21,25),OfflineRecipeIngredient(27,15),OfflineRecipeIngredient(12,15)]),
+  OfflineRecipe(94,'Chana Masala','حمص ماسالا','Chana Masala','Pakistani',5,15,35,[OfflineRecipeIngredient(9,900),OfflineRecipeIngredient(3,200),OfflineRecipeIngredient(4,350),OfflineRecipeIngredient(10,25),OfflineRecipeIngredient(27,15),OfflineRecipeIngredient(12,15),OfflineRecipeIngredient(28,20)]),
+  OfflineRecipe(95,'Rajma Chawal','رز مع فاصولياء حمراء','Rajma Chawal','Pakistani',6,15,45,[OfflineRecipeIngredient(38,850),OfflineRecipeIngredient(7,450),OfflineRecipeIngredient(3,180),OfflineRecipeIngredient(4,300),OfflineRecipeIngredient(10,25)]),
+  OfflineRecipe(96,'Daal Chawal','رز مع عدس','Daal Chawal','Pakistani',6,15,40,[OfflineRecipeIngredient(42,380),OfflineRecipeIngredient(7,450),OfflineRecipeIngredient(3,160),OfflineRecipeIngredient(4,220),OfflineRecipeIngredient(21,20)]),
+  OfflineRecipe(97,'Chicken Jalfrezi','جالفريزي دجاج','Chicken Jalfrezi','Pakistani',5,20,30,[OfflineRecipeIngredient(1,700),OfflineRecipeIngredient(25,350),OfflineRecipeIngredient(3,180),OfflineRecipeIngredient(4,300),OfflineRecipeIngredient(10,25),OfflineRecipeIngredient(26,20)]),
+  OfflineRecipe(98,'Keema Matar','لحم مفروم مع بازلاء','Qeema Matar','Pakistani',5,15,35,[OfflineRecipeIngredient(17,650),OfflineRecipeIngredient(31,350),OfflineRecipeIngredient(3,180),OfflineRecipeIngredient(4,250),OfflineRecipeIngredient(21,25)]),
+  OfflineRecipe(99,'Chicken Yakhni Rice','رز يخني بالدجاج','Chicken Yakhni Chawal','Pakistani',6,20,50,[OfflineRecipeIngredient(1,700),OfflineRecipeIngredient(7,500),OfflineRecipeIngredient(80,800),OfflineRecipeIngredient(3,160),OfflineRecipeIngredient(21,25)]),
+  OfflineRecipe(100,'Vegetable Pulao','بولاو خضار','Sabzi Pulao','Pakistani',6,20,40,[OfflineRecipeIngredient(7,500),OfflineRecipeIngredient(31,220),OfflineRecipeIngredient(32,220),OfflineRecipeIngredient(33,220),OfflineRecipeIngredient(3,160),OfflineRecipeIngredient(21,25)]),
+  OfflineRecipe(101,'Fasolia Bil Lahme','فاصولياء باللحمة','Fasolia bil Lahme','Syrian',6,20,55,[OfflineRecipeIngredient(70,900),OfflineRecipeIngredient(15,600),OfflineRecipeIngredient(4,450),OfflineRecipeIngredient(3,180),OfflineRecipeIngredient(10,25)]),
+  OfflineRecipe(102,'Bamieh Bil Lahme','بامية باللحمة','Bamieh bil Lahme','Syrian',6,20,55,[OfflineRecipeIngredient(35,900),OfflineRecipeIngredient(15,600),OfflineRecipeIngredient(4,450),OfflineRecipeIngredient(3,180),OfflineRecipeIngredient(10,25)]),
+  OfflineRecipe(103,'Kousa Bil Laban','كوسا باللبن','Kousa bil Laban','Syrian',6,30,50,[OfflineRecipeIngredient(36,1000),OfflineRecipeIngredient(17,450),OfflineRecipeIngredient(7,250),OfflineRecipeIngredient(8,900),OfflineRecipeIngredient(12,15)]),
+  OfflineRecipe(104,'Shorbet Freekeh Style','شوربة فريكة','Shorbet Freekeh','Syrian',6,15,45,[OfflineRecipeIngredient(6,350),OfflineRecipeIngredient(1,450),OfflineRecipeIngredient(80,1200),OfflineRecipeIngredient(3,150)]),
+  OfflineRecipe(105,'Batata Harra','بطاطا حرة','Batata Harra','Syrian',5,15,35,[OfflineRecipeIngredient(2,1000),OfflineRecipeIngredient(10,35),OfflineRecipeIngredient(12,20),OfflineRecipeIngredient(28,30),OfflineRecipeIngredient(13,50)]),
+  OfflineRecipe(106,'Mfaraket Batata','مفركة بطاطا','Mfaraket Batata','Syrian',4,15,30,[OfflineRecipeIngredient(2,700),OfflineRecipeIngredient(11,300),OfflineRecipeIngredient(3,150),OfflineRecipeIngredient(10,25)]),
+  OfflineRecipe(107,'Mloukhieh Style Chicken','ملوخية بالدجاج','Molokhia Chicken','Syrian',6,25,55,[OfflineRecipeIngredient(14,800),OfflineRecipeIngredient(1,700),OfflineRecipeIngredient(12,25),OfflineRecipeIngredient(28,25),OfflineRecipeIngredient(10,25)]),
+  OfflineRecipe(108,'Lentil Bulgur Pilaf','برغل بالعدس','Bulgur bil Adas','Syrian',6,15,40,[OfflineRecipeIngredient(6,400),OfflineRecipeIngredient(5,300),OfflineRecipeIngredient(3,250),OfflineRecipeIngredient(10,35)]),
+  OfflineRecipe(109,'Syrian White Bean Stew','يخنة فاصولياء بيضاء','Yakhnet Fasolia','Syrian',6,20,50,[OfflineRecipeIngredient(70,900),OfflineRecipeIngredient(4,450),OfflineRecipeIngredient(3,180),OfflineRecipeIngredient(15,450),OfflineRecipeIngredient(10,25)]),
+  OfflineRecipe(110,'Eggplant Yogurt Salad','سلطة باذنجان باللبن','Batinjan bil Laban','Syrian',5,15,30,[OfflineRecipeIngredient(34,800),OfflineRecipeIngredient(8,450),OfflineRecipeIngredient(12,15),OfflineRecipeIngredient(13,40),OfflineRecipeIngredient(10,25)]),
+  OfflineRecipe(111,'Chicken Cacciatore','دجاج كاتشاتوري','Chicken Cacciatore','European',5,20,45,[OfflineRecipeIngredient(1,750),OfflineRecipeIngredient(4,450),OfflineRecipeIngredient(25,250),OfflineRecipeIngredient(3,180),OfflineRecipeIngredient(72,250),OfflineRecipeIngredient(10,30)]),
+  OfflineRecipe(112,'Vegetable Minestrone','شوربة مينيستروني بالخضار','Vegetable Minestrone','European',6,20,40,[OfflineRecipeIngredient(70,500),OfflineRecipeIngredient(32,250),OfflineRecipeIngredient(36,250),OfflineRecipeIngredient(37,250),OfflineRecipeIngredient(4,350),OfflineRecipeIngredient(47,180),OfflineRecipeIngredient(80,1000)]),
+  OfflineRecipe(113,'Tuna Tomato Pasta','باستا بالتونا والطماطم','Tuna Tomato Pasta','European',5,15,25,[OfflineRecipeIngredient(47,450),OfflineRecipeIngredient(45,400),OfflineRecipeIngredient(4,450),OfflineRecipeIngredient(3,150),OfflineRecipeIngredient(10,25)]),
+  OfflineRecipe(114,'Chicken Mushroom Pasta','باستا بالدجاج والفطر','Chicken Mushroom Pasta','European',5,20,30,[OfflineRecipeIngredient(47,450),OfflineRecipeIngredient(1,550),OfflineRecipeIngredient(72,350),OfflineRecipeIngredient(23,150),OfflineRecipeIngredient(3,120),OfflineRecipeIngredient(10,20)]),
+  OfflineRecipe(115,'Baked Vegetable Omelette','أومليت خضار بالفرن','Baked Vegetable Omelette','European',4,15,25,[OfflineRecipeIngredient(11,400),OfflineRecipeIngredient(25,180),OfflineRecipeIngredient(14,180),OfflineRecipeIngredient(72,180),OfflineRecipeIngredient(50,80),OfflineRecipeIngredient(10,15)]),
+  OfflineRecipe(116,'Salmon Pasta','باستا بالسلمون','Salmon Pasta','European',5,15,25,[OfflineRecipeIngredient(47,450),OfflineRecipeIngredient(44,500),OfflineRecipeIngredient(23,160),OfflineRecipeIngredient(14,180),OfflineRecipeIngredient(10,20)]),
+  OfflineRecipe(117,'Potato Leek Soup','شوربة البطاطا والكراث','Potato Leek Soup','European',6,15,40,[OfflineRecipeIngredient(2,800),OfflineRecipeIngredient(74,350),OfflineRecipeIngredient(80,1000),OfflineRecipeIngredient(22,350),OfflineRecipeIngredient(20,25)]),
+  OfflineRecipe(118,'Stuffed Bell Peppers','فليفلة محشية','Stuffed Bell Peppers','European',6,25,45,[OfflineRecipeIngredient(25,900),OfflineRecipeIngredient(17,500),OfflineRecipeIngredient(7,300),OfflineRecipeIngredient(4,350),OfflineRecipeIngredient(3,150),OfflineRecipeIngredient(52,120)]),
+  OfflineRecipe(119,'Broccoli Chicken Bake','صينية بروكلي بالدجاج','Broccoli Chicken Bake','European',5,20,35,[OfflineRecipeIngredient(1,650),OfflineRecipeIngredient(73,650),OfflineRecipeIngredient(22,300),OfflineRecipeIngredient(50,140),OfflineRecipeIngredient(20,20)]),
+  OfflineRecipe(120,'Mediterranean Chickpea Salad','سلطة حمص متوسطية','Mediterranean Chickpea Salad','European',5,15,0,[OfflineRecipeIngredient(9,800),OfflineRecipeIngredient(4,350),OfflineRecipeIngredient(24,300),OfflineRecipeIngredient(25,180),OfflineRecipeIngredient(51,120),OfflineRecipeIngredient(10,30),OfflineRecipeIngredient(13,50)]),
+
 ];
 
 OfflineIngredient ingredientById(int id) => offlineIngredients.firstWhere((x) => x.id == id);
+
+
+class OfflineNutrition {
+  final double calories, protein, carbs, fat, fiber;
+  const OfflineNutrition(this.calories, this.protein, this.carbs, this.fat, this.fiber);
+}
+
+OfflineNutrition nutritionForRecipe(OfflineRecipe recipe, {int? servings}) {
+  var cal=0.0, protein=0.0, carbs=0.0, fat=0.0, fiber=0.0;
+  for (final ri in recipe.ingredients) {
+    final i=ingredientById(ri.ingredientId);
+    final f=ri.quantityG/100.0;
+    cal += i.calories*f; protein += i.protein*f; carbs += i.carbs*f; fat += i.fat*f; fiber += i.fiber*f;
+  }
+  final divisor=(servings ?? recipe.servings).clamp(1, 100);
+  return OfflineNutrition(cal/divisor, protein/divisor, carbs/divisor, fat/divisor, fiber/divisor);
+}
+
+List<String> validateOfflineData() {
+  final errors=<String>[];
+  final ingredientIds=<int>{};
+  final ingredientKeys=<String>{};
+  for (final i in offlineIngredients) {
+    if (!ingredientIds.add(i.id)) errors.add('Duplicate ingredient id: ${i.id}');
+    if (!ingredientKeys.add(i.key)) errors.add('Duplicate ingredient key: ${i.key}');
+    if (i.nameEn.trim().isEmpty || i.nameAr.trim().isEmpty || i.nameRo.trim().isEmpty) errors.add('Missing ingredient language: ${i.id}');
+    if ([i.calories,i.protein,i.carbs,i.fat,i.fiber].any((v)=>v<0)) errors.add('Negative nutrition value: ${i.key}');
+  }
+  final recipeIds=<int>{}; final recipeNames=<String>{};
+  for (final r in offlineRecipes) {
+    if (!recipeIds.add(r.id)) errors.add('Duplicate recipe id: ${r.id}');
+    if (!recipeNames.add(r.nameEn.toLowerCase())) errors.add('Duplicate recipe name: ${r.nameEn}');
+    if (r.nameEn.trim().isEmpty || r.nameAr.trim().isEmpty || r.nameRo.trim().isEmpty) errors.add('Missing recipe language: ${r.id}');
+    if (r.servings<=0) errors.add('Invalid servings: ${r.id}');
+    if (r.prepMinutes<0 || r.cookMinutes<0) errors.add('Invalid time: ${r.id}');
+    if (r.ingredients.isEmpty) errors.add('No ingredients: ${r.id}');
+    for (final ri in r.ingredients) {
+      if (!ingredientIds.contains(ri.ingredientId)) errors.add('Missing ingredient ${ri.ingredientId} in recipe ${r.id}');
+      if (ri.quantityG<=0) errors.add('Invalid quantity in recipe ${r.id}');
+    }
+    if (r.ingredients.isNotEmpty && r.servings>0) {
+      final n=nutritionForRecipe(r);
+      if (n.calories<30 || n.calories>1500) errors.add('Calories/serving out of range (${n.calories.toStringAsFixed(0)}): ${r.id} ${r.nameEn}');
+    }
+  }
+  return errors;
+}
 
 String normalizeOfflineIngredient(String value) {
   final v = value.trim().toLowerCase();
