@@ -31,7 +31,8 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen>{
     FilledButton(onPressed:calculate,child:Text(s.isArabic?'احسب المؤشرات':'Calculate')),const SizedBox(height:16),
     if(error!=null) Text(s.isArabic?'يرجى إدخال قيم صحيحة':'Please enter valid values',style:TextStyle(color:Theme.of(context).colorScheme.error)),
     if(result!=null)...[_indicator('BMI',result!.bmi.toStringAsFixed(1)),_indicator(s.isArabic?'تصنيف BMI':'BMI Range',result!.bmiCategory),_indicator('BMR','${result!.bmr.round()} kcal'),_indicator('TDEE','${result!.tdee.round()} kcal'),_indicator(s.isArabic?'الهدف اليومي التقديري':'Estimated Daily Target','${result!.calorieTarget.round()} kcal'),const SizedBox(height:8),Text(s.isArabic?'هذه مؤشرات تقديرية وليست تشخيصًا طبيًا.':'These are estimates, not medical diagnoses.',style:Theme.of(context).textTheme.bodySmall)]
-  ]))));}
+  ])));
+  }
   Widget _indicator(String label,String value)=>Card(child:ListTile(title:Text(label),trailing:Text(value,style:const TextStyle(fontWeight:FontWeight.bold))));
 }
 
