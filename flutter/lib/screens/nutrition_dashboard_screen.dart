@@ -88,7 +88,7 @@ class _NutritionDashboardScreenState
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: sex,
+              initialValue: sex,
               items: const [
                 DropdownMenuItem(value: 'female', child: Text('Female')),
                 DropdownMenuItem(value: 'male', child: Text('Male')),
@@ -97,7 +97,7 @@ class _NutritionDashboardScreenState
               decoration: const InputDecoration(labelText: 'Sex'),
             ),
             DropdownButtonFormField<String>(
-              value: activity,
+              initialValue: activity,
               items: const [
                 DropdownMenuItem(value: 'sedentary', child: Text('Sedentary')),
                 DropdownMenuItem(value: 'low', child: Text('Low')),

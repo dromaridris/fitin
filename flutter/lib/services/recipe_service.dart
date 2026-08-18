@@ -14,7 +14,7 @@ class RecipeService {
       '/recipes',
       query: {
         if (query.trim().isNotEmpty) 'q': query.trim(),
-        if (cuisine != null && cuisine.isNotEmpty) 'cuisine': cuisine!,
+        if (cuisine != null && cuisine.isNotEmpty) 'cuisine': cuisine,
       },
     );
     final list = (data['items'] ?? data['data']?['items'] ?? []) as List;
