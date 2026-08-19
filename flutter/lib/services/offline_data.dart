@@ -607,3 +607,205 @@ String normalizeOfflineIngredient(String value) {
   };
   return aliases[v] ?? v;
 }
+
+double totalIngredientWeightG(OfflineRecipe recipe) => recipe.ingredients
+    .fold(0.0, (sum, item) => sum + item.quantityG);
+
+double totalRecipeCalories(OfflineRecipe recipe) {
+  var total = 0.0;
+  for (final ri in recipe.ingredients) {
+    final ingredient = ingredientById(ri.ingredientId);
+    total += ingredient.calories * (ri.quantityG / 100.0);
+  }
+  return total;
+}
+
+String cuisineLabel(String cuisine, String languageCode) {
+  if (languageCode == 'ar') {
+    switch (cuisine) {
+      case 'Pakistani':
+        return 'باكستاني';
+      case 'Syrian':
+        return 'شامي / سوري';
+      case 'European':
+        return 'أوروبي';
+    }
+  }
+  if (languageCode == 'ro') {
+    switch (cuisine) {
+      case 'Pakistani':
+        return 'Pakistani';
+      case 'Syrian':
+        return 'Shami / Syrian';
+      case 'European':
+        return 'European';
+    }
+  }
+  return cuisine;
+}
+
+String recipeDescription(OfflineRecipe recipe, String languageCode) {
+  if (languageCode == 'ar') {
+    return 'وصفة ${recipe.nameAr} من المطبخ ${cuisineLabel(recipe.cuisine, 'ar')}، تكفي تقريباً ${recipe.servings} حصص. القيم الغذائية محسوبة من كميات المكونات المدرجة.';
+  }
+  if (languageCode == 'ro') {
+    return '${recipe.nameRo} ${cuisineLabel(recipe.cuisine, 'ro')} style recipe hai, taqreeban ${recipe.servings} servings ke liye. Nutrition listed ingredients ki quantity se calculate hoti hai.';
+  }
+  return '${recipe.nameEn} is a ${recipe.cuisine} recipe yielding about ${recipe.servings} servings. Nutrition is calculated from the listed ingredient quantities.';
+}
+
+List<String> recipeCookingSteps(OfflineRecipe recipe, String languageCode) {
+  final n = recipe.nameEn.toLowerCase();
+  final isCold = recipe.cookMinutes == 0 || n.contains('salad') || n.contains('hummus');
+  final isRice = n.contains('biryani') || n.contains('pulao') || n.contains('chawal') || n.contains('rice');
+  final isPasta = n.contains('pasta') || n.contains('spaghetti') || n.contains('lasagna');
+  final isSoup = n.contains('soup') || n.contains('shorbet') || n.contains('minestrone');
+  final isBake = n.contains('bake') || n.contains('baked') || n.contains('gratin') || n.contains('stuffed bell');
+  final isEgg = n.contains('omelette') || n.contains('egg');
+  final isDal = n.contains('dal') || n.contains('daal') || n.contains('lentil') || n.contains('haleem');
+
+  if (languageCode == 'ar') {
+    if (isCold) {
+      return [
+        'حضّر واغسل وقطّع المكونات كما هو موضح في القائمة.',
+        'اخلط المكونات الأساسية جيداً، ثم أضف الصلصة أو اللبن/الطحينة/الليمون حسب مكونات الوصفة.',
+        'تذوق واضبط التتبيل باعتدال، ثم اتركها عدة دقائق حتى تتجانس النكهات.',
+        'قدّمها باردة أو بدرجة حرارة الغرفة، وازن الكمية النهائية إذا أردت حساب غرامات الحصة بدقة.',
+      ];
+    }
+    if (isRice) {
+      return [
+        'حضّر المكونات واغسل الأرز، وانقعه إذا كانت الطريقة المعتادة للوصفة تتطلب ذلك.',
+        'اطهُ اللحم/الدجاج والخضار مع البصل والثوم والزنجبيل والبهارات المتوفرة حتى تنضج المكونات الأساسية.',
+        'أضف الأرز والسائل المناسب واطهُ على نار هادئة حتى ينضج الأرز ويمتص السائل.',
+        'اترك الطبخة ترتاح 5–10 دقائق قبل التقليب والتقديم، ثم زن القدر النهائي للحصول على أدق حساب للحصة.',
+      ];
+    }
+    if (isPasta) {
+      return [
+        'اسلق المعكرونة في ماء حتى تصبح al dente ثم صفّها.',
+        'حضّر الصلصة بطهي البصل/الثوم ثم المكونات الرئيسية والطماطم أو الكريمة حسب الوصفة.',
+        'اخلط المعكرونة مع الصلصة والمكونات الأخرى، وأضف الجبن إن كان مدرجاً.',
+        isBake ? 'انقلها إلى صينية واخبزها حتى تتماسك ويحمر الوجه.' : 'سخّن الخليط عدة دقائق ثم قدّم مباشرة.',
+      ];
+    }
+    if (isSoup || isDal) {
+      return [
+        'اغسل البقوليات/الحبوب وقطّع الخضار وحضّر باقي المكونات.',
+        'شوّح البصل والثوم والزنجبيل بقليل من الدهن المدرج، ثم أضف المكونات الأساسية.',
+        'أضف الماء أو المرق واطهُ على نار هادئة حتى تصبح المكونات طرية ومتماسكة.',
+        'اضبط القوام والتتبيل في النهاية، وقدّمها ساخنة.',
+      ];
+    }
+    if (isEgg) {
+      return [
+        'حضّر وقطّع الخضار أو المكونات الإضافية.',
+        'اخفق البيض واخلطه مع المكونات والتتبيل.',
+        'اطهُ الخليط على نار متوسطة أو بالفرن حسب اسم الوصفة حتى يتماسك البيض تماماً.',
+        'قسّم الطبخة حسب الوزن أو السعرات المطلوبة وقدّمها ساخنة.',
+      ];
+    }
+    if (isBake) {
+      return [
+        'سخّن الفرن وحضّر جميع المكونات وقطّعها بالحجم المناسب.',
+        'اطهُ المكونات التي تحتاج تسوية مسبقة، ثم اخلطها أو رتبها في صينية.',
+        'أضف الصلصة/الحليب/الجبن حسب مكونات الوصفة.',
+        'اخبز حتى تنضج المكونات ويتماسك الطبق ويحمر الوجه باعتدال.',
+      ];
+    }
+    return [
+      'حضّر وقطّع جميع المكونات المدرجة قبل بدء الطبخ.',
+      'ابدأ بالبصل والثوم/الزنجبيل إن وُجدت، ثم أضف اللحم أو الدجاج أو المكوّن الأساسي واطهُه جيداً.',
+      'أضف الخضار والطماطم/اللبن/المرق وباقي المكونات تدريجياً، واطهُ على نار مناسبة حتى تنضج.',
+      'اضبط القوام والتتبيل في النهاية، ثم قدّم الطبخة وقسّمها حسب الوزن والسعرات المطلوبة.',
+    ];
+  }
+
+  if (languageCode == 'ro') {
+    if (isCold) {
+      return [
+        'Tamam ingredients ko wash, cut aur measure kar lein.',
+        'Main ingredients ko dressing, dahi, tahini ya lemon ke saath recipe ke mutabiq mix karein.',
+        'Seasoning taste ke mutabiq adjust karein aur flavours ko kuch minutes settle hone dein.',
+        'Cold ya room temperature par serve karein; accurate portion ke liye final dish weigh karein.',
+      ];
+    }
+    if (isRice) {
+      return [
+        'Rice ko wash karein aur agar zaroori ho to soak karein.',
+        'Chicken/meat aur sabzi ko onion, garlic, ginger aur available spices ke saath cook karein.',
+        'Rice aur suitable liquid add karke low heat par rice tender hone tak pakayein.',
+        '5–10 minutes rest dein, phir gently mix karein aur accurate portion ke liye final pot weigh karein.',
+      ];
+    }
+    if (isPasta) {
+      return [
+        'Pasta ko al dente boil karke drain karein.',
+        'Onion/garlic aur main ingredients se sauce tayyar karein; tomato ya cream recipe ke mutabiq use karein.',
+        'Pasta ko sauce ke saath mix karein aur listed cheese ho to add karein.',
+        isBake ? 'Baking dish mein daal kar set aur lightly golden hone tak bake karein.' : 'Kuch minutes heat karke serve karein.',
+      ];
+    }
+    return [
+      'Sab ingredients ko pehle prepare, cut aur measure karein.',
+      'Onion/garlic/ginger ho to pehle cook karein, phir main protein ya core ingredient add karein.',
+      'Baaki vegetables, tomato/dahi/stock aur ingredients add karke tender hone tak pakayein.',
+      'Seasoning aur consistency adjust karein; portion calories ke mutabiq final dish ko weigh karke serve karein.',
+    ];
+  }
+
+  if (isCold) {
+    return [
+      'Wash, prepare and measure all listed ingredients.',
+      'Combine the main ingredients, then add the listed dressing, yogurt, tahini or lemon components.',
+      'Adjust seasoning modestly and let the flavours combine for a few minutes.',
+      'Serve chilled or at room temperature; weigh the finished dish for the most accurate calorie-based portion.',
+    ];
+  }
+  if (isRice) {
+    return [
+      'Wash the rice and soak it first when appropriate for the dish.',
+      'Cook the meat/chicken and vegetables with the listed aromatics until the main ingredients are nearly done.',
+      'Add rice and the appropriate cooking liquid, then cook gently until the rice is tender and the liquid is absorbed.',
+      'Rest for 5–10 minutes before fluffing. Weigh the finished pot if you want precise grams per calorie allowance.',
+    ];
+  }
+  if (isPasta) {
+    return [
+      'Boil the pasta until al dente and drain.',
+      'Prepare the sauce by cooking the aromatics and main ingredients, using tomato or cream as listed.',
+      'Combine the pasta with the sauce and add any listed cheese.',
+      isBake ? 'Transfer to a baking dish and bake until set and lightly browned.' : 'Heat together for a few minutes and serve.',
+    ];
+  }
+  if (isSoup || isDal) {
+    return [
+      'Rinse the pulses/grains and prepare the vegetables and remaining ingredients.',
+      'Cook the aromatics in the listed fat, then add the main ingredients.',
+      'Add water or stock and simmer until the ingredients are tender and the desired texture is reached.',
+      'Adjust consistency and seasoning at the end and serve hot.',
+    ];
+  }
+  if (isEgg) {
+    return [
+      'Prepare and chop the vegetables or other additions.',
+      'Beat the eggs and combine with the listed ingredients.',
+      'Cook over moderate heat or bake, depending on the dish, until the egg is fully set.',
+      'Serve hot and portion by weight when calorie precision matters.',
+    ];
+  }
+  if (isBake) {
+    return [
+      'Preheat the oven and prepare all ingredients.',
+      'Pre-cook any ingredients that need it, then arrange or combine them in a baking dish.',
+      'Add the listed sauce, milk or cheese components.',
+      'Bake until the dish is cooked through, set and lightly browned.',
+    ];
+  }
+  return [
+    'Prepare, chop and measure all listed ingredients before cooking.',
+    'Cook the aromatics first when present, then add the main protein or core ingredient and cook thoroughly.',
+    'Add the vegetables and remaining tomato, yogurt, stock or other ingredients and cook until tender.',
+    'Adjust the final consistency and seasoning, then portion the finished dish by weight according to your calorie allowance.',
+  ];
+}

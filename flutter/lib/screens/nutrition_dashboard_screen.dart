@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/nutrition_profile.dart';
+import '../services/dietary_guidance_service.dart';
 import '../services/nutrition_log_service.dart';
 import '../services/nutrition_profile_service.dart';
 import '../state/app_state.dart';
@@ -88,6 +89,8 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             _TodaySection(logService: logService),
+            const SizedBox(height: 20),
+            const _WhoGuidanceSection(),
             const SizedBox(height: 28),
             Text(
               state.isArabic
@@ -282,6 +285,78 @@ class _TodaySection extends StatelessWidget {
           }),
         ],
       ],
+    );
+  }
+}
+
+
+class _WhoGuidanceSection extends StatelessWidget {
+  const _WhoGuidanceSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<AppState>();
+    final guidance = DietaryGuidanceService();
+    final targets = guidance.forCalories(state.calorieTarget);
+    final protein = state.todayLog.fold(0.0, (sum, x) => sum + x.proteinG);
+    final carbs = state.todayLog.fold(0.0, (sum, x) => sum + x.carbsG);
+    final fat = state.todayLog.fold(0.0, (sum, x) => sum + x.fatG);
+    final fiber = state.todayLog.fold(0.0, (sum, x) => sum + x.fiberG);
+    final advice = guidance.dailyAdvice(
+      languageCode: state.languageCode,
+      calorieTarget: state.calorieTarget,
+      proteinG: protein,
+      carbsG: carbs,
+      fatG: fat,
+      fiberG: fiber,
+    );
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              state.isArabic ? 'إرشادات غذائية عامة — WHO' : 'General healthy-diet guidance — WHO',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              state.isArabic
+                  ? 'للبالغين بشكل عام: ≥400 غ خضار وفواكه، ≥25 غ ألياف، الدهون الكلية ≤30% من الطاقة، السكريات الحرة <10%، والملح <5 غ يومياً.'
+                  : 'For most adults: ≥400 g fruit & vegetables, ≥25 g fibre, total fat ≤30% of energy, free sugars <10%, and salt <5 g/day.',
+            ),
+            const SizedBox(height: 10),
+            Text(
+              state.isArabic
+                  ? 'نطاق تقريبي لهدف ${state.calorieTarget.round()} kcal: بروتين ${targets.proteinMinG.round()}–${targets.proteinMaxG.round()} غ، دهون ${targets.fatMinG.round()}–${targets.fatMaxG.round()} غ، كربوهيدرات ${targets.carbsMinG.round()}–${targets.carbsMaxG.round()} غ.'
+                  : 'Approximate range for ${state.calorieTarget.round()} kcal: protein ${targets.proteinMinG.round()}–${targets.proteinMaxG.round()} g, fat ${targets.fatMinG.round()}–${targets.fatMaxG.round()} g, carbohydrate ${targets.carbsMinG.round()}–${targets.carbsMaxG.round()} g.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 12),
+            ...advice.map(
+              (x) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('• '),
+                    Expanded(child: Text(x)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              state.isArabic
+                  ? 'هذه إرشادات عامة وليست حمية علاجية. الحمل والرضاعة، الأطفال، الرياضيون، وأمراض الكلى/الكبد وغيرها قد تحتاج أهدافاً مختلفة.'
+                  : 'These are general population targets, not a therapeutic diet. Pregnancy/lactation, children, athletes and medical conditions may need different targets.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

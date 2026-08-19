@@ -7,7 +7,7 @@ enum AppLanguage { english, arabic, romanUrdu }
 /// A single food item logged against today's date.
 class FoodLogItem {
   final String name;
-  final double calories, proteinG, carbsG, fatG;
+  final double calories, proteinG, carbsG, fatG, fiberG;
 
   FoodLogItem({
     required this.name,
@@ -15,6 +15,7 @@ class FoodLogItem {
     required this.proteinG,
     required this.carbsG,
     required this.fatG,
+    this.fiberG = 0,
   });
 
   Map<String, dynamic> toJson() => {
@@ -23,6 +24,7 @@ class FoodLogItem {
         'protein_g': proteinG,
         'carbs_g': carbsG,
         'fat_g': fatG,
+        'fiber_g': fiberG,
       };
 
   factory FoodLogItem.fromJson(Map<String, dynamic> j) => FoodLogItem(
@@ -31,6 +33,7 @@ class FoodLogItem {
         proteinG: (j['protein_g'] as num? ?? 0).toDouble(),
         carbsG: (j['carbs_g'] as num? ?? 0).toDouble(),
         fatG: (j['fat_g'] as num? ?? 0).toDouble(),
+        fiberG: (j['fiber_g'] as num? ?? 0).toDouble(),
       );
 }
 
@@ -38,6 +41,7 @@ class AppState extends ChangeNotifier {
   AppLanguage language = AppLanguage.english;
   final List<String> selectedIngredients = [];
   final Set<int> favoriteRecipeIds = {};
+  String? selectedCuisine;
 
   /// Today's logged food items (persisted locally, keyed by date so it
   /// resets each day) and the user's daily calorie target (from the
@@ -66,6 +70,7 @@ class AppState extends ChangeNotifier {
       (prefs.getStringList('favorite_recipe_ids') ?? []).map(int.parse),
     );
     calorieTarget = prefs.getDouble('calorie_target') ?? 2000;
+    selectedCuisine = prefs.getString('selected_cuisine');
     final raw = prefs.getStringList(_todayKey) ?? [];
     todayLog
       ..clear()
@@ -107,6 +112,24 @@ class AppState extends ChangeNotifier {
     await prefs.setDouble('calorie_target', value);
     notifyListeners();
   }
+
+
+  Future<void> setCuisine(String? value) async {
+    selectedCuisine = value;
+    final prefs = await SharedPreferences.getInstance();
+    if (value == null || value.isEmpty) {
+      await prefs.remove('selected_cuisine');
+    } else {
+      await prefs.setString('selected_cuisine', value);
+    }
+    notifyListeners();
+  }
+
+  double get consumedCalories =>
+      todayLog.fold(0.0, (sum, item) => sum + item.calories);
+
+  double get remainingCalories =>
+      (calorieTarget - consumedCalories).clamp(0.0, double.infinity).toDouble();
 
   void setLanguage(AppLanguage value) {
     language = value;
